@@ -5,7 +5,7 @@ description: "Turn any codebase into a beautiful, interactive single-page HTML c
 
 # Codebase-to-Course
 
-Transform any codebase into a stunning, interactive single-page HTML course. The output is a single self-contained HTML file (no dependencies except Google Fonts) that teaches how the code works through scroll-based modules, animated visualizations, embedded quizzes, and plain-English translations of code.
+Transform any codebase into a stunning, interactive course. The output is a **directory** containing a pre-built `styles.css`, `main.js`, per-module HTML files, and an assembled `index.html` — open it directly in the browser with no setup required (only external dependency: Google Fonts CDN). The course teaches how the code works through scroll-based modules, animated visualizations, embedded quizzes, and plain-English translations of code.
 
 ## First-Run Welcome
 
@@ -46,7 +46,7 @@ The learner already has context that traditional students don't — they've *use
 
 Every module answers **"why should I care?"** before "how does it work?" The answer to "why should I care?" is always practical: *because this knowledge helps you steer AI better, debug faster, or make smarter architectural decisions.*
 
-The single-file constraint is intentional: one HTML file means zero setup, instant sharing, works offline, and forces tight design decisions.
+The directory-based output is intentional: separating CSS/JS from content means AI never regenerates boilerplate, each module is written independently (keeping output size small and quality high), and the assembled `index.html` works offline with zero setup.
 
 ---
 
@@ -104,27 +104,57 @@ These five element types are the backbone of every course. Other interactive ele
 
 ### Phase 3: Build the Course
 
-Generate a single HTML file with embedded CSS and JavaScript. Read `references/design-system.md` for the complete CSS design tokens, typography, and color system. Read `references/interactive-elements.md` for implementation patterns of every interactive element type.
+The course output is a **directory**, not a single file. All CSS and JS are pre-built reference files — never regenerate them. Your job is to write only the HTML content.
 
-**Build order (task by task):**
+**Output structure:**
+```
+course-name/
+  styles.css       ← copied verbatim from references/styles.css
+  main.js          ← copied verbatim from references/main.js
+  _base.html       ← customized shell (title, accent color, nav dots)
+  _footer.html     ← copied verbatim from references/_footer.html
+  build.sh         ← copied verbatim from references/build.sh
+  modules/
+    01-intro.html
+    02-actors.html
+    ...
+  index.html       ← assembled by build.sh (do not write manually)
+```
 
-1. **Foundation first** — HTML shell with all module sections (empty), complete CSS design system, navigation bar with progress tracking, scroll-snap behavior, keyboard navigation, and scroll-triggered animations. After this step, you should have a working skeleton you can scroll through.
+**Build order (step by step):**
 
-2. **One module at a time** — Fill in each module's content, code translations, and interactive elements. Don't try to write all 8 modules in one pass — the quality drops. Build Module 1, verify it works, then Module 2, etc.
+1. **Setup** — Create the course directory. Copy these four files verbatim using Read + Write (do not regenerate their contents):
+   - `references/styles.css` → `course-name/styles.css`
+   - `references/main.js` → `course-name/main.js`
+   - `references/_footer.html` → `course-name/_footer.html`
+   - `references/build.sh` → `course-name/build.sh`
 
-3. **Polish pass** — After all modules are built, do a final pass for transitions, mobile responsiveness, and visual consistency.
+2. **Customize `_base.html`** — Read `references/_base.html`, then write it to `course-name/_base.html` with exactly three substitutions:
+   - Both instances of `COURSE_TITLE` → the actual course title
+   - The four `ACCENT_*` placeholders → the chosen accent color values (pick one palette from the comments in `_base.html`)
+   - `NAV_DOTS` → one `<button class="nav-dot" ...>` per module
 
-**Critical implementation rules:**
-- The file must be completely self-contained (only external dependency: Google Fonts CDN)
-- Use CSS `scroll-snap-type: y proximity` (NOT `mandatory` — mandatory traps users in long modules)
-- Use `min-height: 100dvh` with `100vh` fallback for sections
-- Only animate `transform` and `opacity` for GPU performance
-- Wrap all JS in an IIFE, use `passive: true` on scroll listeners, throttle with `requestAnimationFrame`
-- Include touch support for drag-and-drop, keyboard navigation (arrow keys), and ARIA attributes
+3. **One module at a time** — For each module, write `course-name/modules/0N-slug.html` containing only the `<section class="module" id="module-N">` block and its contents. Do not include `<html>`, `<head>`, `<body>`, `<style>`, or `<script>` tags — those come from the base and reference files. Build one module, then the next.
+   - Read `references/interactive-elements.md` for HTML patterns for each interactive element type. CSS and JS are already in `styles.css` and `main.js` — do not inline them.
+   - Read `references/design-system.md` for visual conventions (spacing, typography, color variable names).
+
+4. **Assemble** — After all modules are written, run `build.sh` from the course directory:
+   ```bash
+   cd course-name && bash build.sh
+   ```
+   This produces `index.html`. Open it in the browser.
+
+**Critical rules:**
+- **Never regenerate** `styles.css` or `main.js` — always copy from references
+- Module files contain only `<section>` content — no boilerplate
+- Use CSS `scroll-snap-type: y proximity` (NOT `mandatory`)
+- Use `min-height: 100dvh` with `100vh` fallback on `.module`
+- Interactive element JS is in `main.js`; wire up via `data-*` attributes and CSS class names as shown in `references/interactive-elements.md`
+- Chat containers need `id` attributes; flow animations need `data-steps='[...]'` JSON on `.flow-animation`
 
 ### Phase 4: Review and Open
 
-After generating the course HTML file, open it in the browser for the user to review. Walk them through what was built and ask for feedback on content, design, and interactivity.
+After running `build.sh`, open `index.html` in the browser. Walk the user through what was built and ask for feedback on content, design, and interactivity.
 
 ---
 
