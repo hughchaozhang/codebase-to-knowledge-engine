@@ -1,12 +1,6 @@
-# Codebase to Knowledge Engine
+# Codebase to Course
 
-A Claude Code skill that turns any codebase into:
-• executive walkthrough
-• onboarding course
-• architecture deep dive
-• feature learning path
-• 30-minute repo explainer
-• a beautiful, interactive single-page HTML course.
+A Claude Code skill that turns any codebase into a beautiful, interactive single-page HTML course.
 
 Point it at a repo. Get back a stunning, self-contained course that teaches how the code works — with scroll-based navigation, animated visualizations, embedded quizzes, and code-with-plain-English side-by-side translations.
 
@@ -14,7 +8,15 @@ Point it at a repo. Get back a stunning, self-contained course that teaches how 
 
 **"Vibe coders"** — people who build software by instructing AI coding tools in natural language, without a traditional CS education.
 
+You've built something (or found something cool on GitHub). It works. But you don't really understand *how* it works under the hood. This skill generates a course that teaches you — not by lecturing, but by tracing what happens when you actually use the app.
 
+**Your goals are practical, not academic:**
+- Steer AI coding tools better (make smarter architectural decisions)
+- Detect when AI is wrong (spot hallucinations, catch bad patterns)
+- Debug when AI gets stuck (break out of bug loops)
+- Talk to engineers without feeling lost
+
+You're not trying to become a software engineer. You want coding as a superpower.
 
 ## What the course looks like
 
@@ -38,15 +40,25 @@ The output is a **single HTML file** — no dependencies, no setup, works offlin
 
 ## How to use
 
-### As an Agent skill
+### As a Claude Code skill
+
+1. Copy the `codebase-to-course` folder into `~/.claude/skills/`
+2. Open any project in Claude Code
+3. Say: *"Turn this codebase into an interactive course"*
 
 ### Trigger phrases
 
 - "Turn this into a course"
-- "Explain this codebase"
-
+- "Explain this codebase interactively"
+- "Make a course from this project"
+- "Teach me how this code works"
+- "Interactive tutorial from this code"
 
 ## Design philosophy
+
+### Build first, understand later
+
+This inverts traditional CS education. The old way: memorize concepts for years → eventually build something → finally see the point (most people quit before step 3). This way: **build something → experience it working → now understand how it works.**
 
 ### Show, don't tell
 
@@ -74,3 +86,8 @@ codebase-to-course/
     └── interactive-elements.md       # Quiz, animation, and visualization patterns
 ```
 
+
+
+---
+
+Built by [Zara](https://x.com/zarazhangrui) with Claude Code.
