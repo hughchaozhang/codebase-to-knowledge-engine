@@ -2,6 +2,8 @@
 
 Implementation patterns for every interactive element type used in courses. Pick the elements that best serve each module's teaching goal.
 
+> **Read strategy:** This file is too large to read comfortably in one shot. Always read only the sections you need for the current module by jumping to specific headings or line ranges.
+
 > **Architecture note:** All CSS and JavaScript for these elements live in `references/styles.css` and `references/main.js`, which are copied verbatim into every course directory. When writing module HTML files, use only the HTML patterns below — do **not** inline `<style>` or `<script>` tags for these elements. The engines in `main.js` auto-initialize on page load by scanning for the relevant class names and `data-*` attributes described here.
 
 ## Table of Contents
@@ -118,6 +120,8 @@ The most important teaching element. Shows real code from the project on the lef
 For testing understanding with instant feedback. Each question has options, one correct answer, and per-question explanations.
 
 **Wiring:** `main.js` exposes `window.selectOption(btn)`, `window.checkQuiz(containerId)`, and `window.resetQuiz(containerId)`. Call them via `onclick`. Per-question explanations go in `data-explanation-right` and `data-explanation-wrong` on the `.quiz-question-block`.
+
+**Important:** quiz container ids must be globally unique across the final assembled `index.html`. Use names like `quiz-module1`, `quiz-module2`, etc. Do not reuse the same id in multiple modules.
 
 **HTML:**
 ```html
@@ -284,7 +288,7 @@ chips.forEach(chip => {
 
 iMessage/WeChat-style chat showing components "talking" to each other. Messages appear one by one with typing indicators.
 
-**Wiring:** `main.js` auto-initializes every `.chat-window` on page load. Give each chat window a unique `id`. Control buttons need these classes: `.chat-next-btn`, `.chat-all-btn`, `.chat-reset-btn`. The typing indicator avatar element should have `id="{chatWindowId}-typing-avatar"` or simply be the first `.chat-avatar` inside `.chat-typing`.
+**Wiring:** `main.js` auto-initializes every `.chat-window` on page load. Give each chat window a unique `id` such as `chat-module2`. Control buttons need these classes: `.chat-next-btn`, `.chat-all-btn`, `.chat-reset-btn`. The typing indicator avatar element should have `id="{chatWindowId}-typing-avatar"` — for example, if the window id is `chat-module2`, the typing avatar should be `id="chat-module2-typing-avatar"`. As a fallback, it can also be the first `.chat-avatar` inside `.chat-typing`.
 
 **HTML:**
 ```html

@@ -30,3 +30,6 @@ Trying to write all modules in one pass causes later modules to be thin and rush
 
 ### Missing Interactive Elements
 A module with only text and code blocks, no interactivity. Every module needs at least one of: quiz, data flow animation, group chat, architecture diagram, drag-and-drop. These aren't decorations — they're how non-technical learners actually process information.
+
+### Broken `data-steps` JSON
+Flow animations silently fail when the JSON inside `data-steps='[...]'` is malformed. The most common mistake is using apostrophes inside a step label, which terminates the HTML attribute early. Avoid single quotes in labels, replace them with `&apos;`, or switch to a double-quoted attribute with escaped inner quotes.

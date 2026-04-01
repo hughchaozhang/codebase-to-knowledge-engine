@@ -1,92 +1,174 @@
-# Codebase to Course
+# Codebase-to-Knowledge-Engine
 
-A Claude Code skill that turns any codebase into a beautiful, interactive single-page HTML course.
+A Claude Code skill for turning a codebase into a polished, interactive HTML learning experience.
 
-Point it at a repo. Get back a stunning, self-contained course that teaches how the code works — with scroll-based navigation, animated visualizations, embedded quizzes, and code-with-plain-English side-by-side translations.
+Point it at a local project, the current repo, or a GitHub URL. It analyzes the codebase, designs a short curriculum, and generates a browser-ready course that explains how the system works through plain-English code translations, data-flow visuals, quizzes, and glossary tooltips.
 
-## Who is this for?
+The spirit of the skill is simple: teach the codebase the way a smart operator would explain it on a whiteboard, not the way a textbook would.
 
-**"Vibe coders"** — people who build software by instructing AI coding tools in natural language, without a traditional CS education.
+## Who this is for
 
-You've built something (or found something cool on GitHub). It works. But you don't really understand *how* it works under the hood. This skill generates a course that teaches you — not by lecturing, but by tracing what happens when you actually use the app.
+This skill is built for **vibe coders** and other non-traditional builders who can ship software with AI help but want a stronger grasp of what the code is actually doing.
 
-**Your goals are practical, not academic:**
-- Steer AI coding tools better (make smarter architectural decisions)
-- Detect when AI is wrong (spot hallucinations, catch bad patterns)
-- Debug when AI gets stuck (break out of bug loops)
-- Talk to engineers without feeling lost
+It is optimized for people who want to:
+- understand architecture without a formal CS background
+- steer AI coding agents more precisely
+- catch bad suggestions and hallucinations
+- debug issues faster
+- learn the vocabulary needed to talk about software clearly
 
-You're not trying to become a software engineer. You want coding as a superpower.
+## What it produces
 
-## What the course looks like
+The working output is a **course directory**.
 
-The output is a **single HTML file** — no dependencies, no setup, works offline. It includes:
+```text
+course-name/
+  styles.css
+  main.js
+  _base.html
+  _footer.html
+  build.sh
+  modules/
+    01-intro.html
+    02-actors.html
+    ...
+  index.html
+```
 
-- **Scroll-based modules** with progress tracking and keyboard navigation
-- **Code ↔ Plain English translations** — real code on the left, what it means on the right
-<img width="720" alt="Code translation block" src="https://github.com/user-attachments/assets/fb9e7fac-05c1-4f98-b80c-46543ef81afc" />
+For complex codebases, the build may also include a temporary `briefs/` directory used to coordinate module writing.
 
-- **Animated visualizations** — data flow animations, group chat between components, architecture diagrams
-<img width="720" alt="Animated data flow" src="https://github.com/user-attachments/assets/20fb403e-7dfd-4a47-989b-bbae86ca8041" />
+### Output contract
 
-- **Interactive quizzes** that test *application* not memorization ("You want to add favorites — which files change?")
-<img width="720" alt="Interactive quiz" src="https://github.com/user-attachments/assets/57706496-9fa8-457a-8450-3da22789951c" />
+- Shared assets come from `references/`
+- Module content is written as separate HTML sections
+- `build.sh` assembles the final course
+- The final deliverable is `index.html`
+- The course runs directly in the browser
+- External dependency: **Google Fonts CDN**
 
-- **Glossary tooltips** — hover any technical term for a plain-English definition
-<img width="720" alt="Glossary tooltip" src="https://github.com/user-attachments/assets/ac2f160a-d73f-4779-97b2-a06fdb5f3227" />
+## What the course includes
 
-  
-- **Warm, distinctive design** — not the typical purple-gradient AI look
+- scroll-based modules with navigation and progress tracking
+- code → plain-English translation blocks using real project code
+- animated data-flow and component-communication visuals
+- interactive quizzes focused on application and debugging judgment
+- glossary tooltips for technical terms
+- a warm, notebook-like visual style instead of generic AI aesthetics
 
 ## How to use
 
-### As a Claude Code skill
+### Install as a Claude Code skill
 
-1. Copy the `codebase-to-course` folder into `~/.claude/skills/`
-2. Open any project in Claude Code
-3. Say: *"Turn this codebase into an interactive course"*
+Copy this folder into your Claude skills directory:
 
-### Trigger phrases
+```bash
+cp -R codebase-to-knowledge-engine ~/.claude/skills/
+```
 
-- "Turn this into a course"
-- "Explain this codebase interactively"
-- "Make a course from this project"
-- "Teach me how this code works"
-- "Interactive tutorial from this code"
+Then open a project in Claude Code and say something like:
+- "Turn this codebase into an interactive course"
+- "Explain this repo as an interactive walkthrough"
+- "Teach me how this project works"
+- "Make a guided codebase tutorial from this repo"
+
+## Recommended workflow
+
+1. Identify the source codebase
+   - current repo
+   - local path
+   - GitHub URL
+2. Analyze the codebase deeply enough to understand the main user flow, actors, and architecture
+3. Design a 4-6 module curriculum
+4. Choose sequential or parallel build path depending on complexity
+5. Copy shared assets from `references/`
+6. Write module files
+7. Run `build.sh`
+8. Open and review `index.html`
+
+## Sequential vs parallel builds
+
+Use the **sequential path** when most of these are true:
+- one main app/runtime or one obvious entry point
+- **5 modules or fewer**
+- roughly fewer than **50 meaningful source files**
+- one agent can comfortably hold the architecture in context
+
+Use the **parallel path** when any of these are true:
+- monorepo or multi-service system
+- multiple distinct subsystems or product surfaces
+- **6+ modules**
+- likely quality drop if one agent writes the entire course in one pass
+
+## Analysis budget
+
+Do not spend unlimited context trying to understand every file.
+
+As a rule of thumb:
+- spend at most about **20% of available context** on codebase analysis
+- prioritize README, entry points, route definitions, main data model, and the primary user journey
+- do not chase every helper or utility unless it is central to the teaching story
+
+## Example module
+
+The repo includes `references/example-module.html`, a grounded reference module based on Karpathy's `autoresearch` repo.
+
+Use it to calibrate:
+- HTML structure
+- visual density
+- translation-block quality
+- quiz tone
+- tooltip usage
+- interactive element wiring
+
+It is a **reference**, not a template to copy blindly.
+
+## Build troubleshooting
+
+If `build.sh` succeeds but the result looks wrong, check these first:
+- `_base.html` placeholders were fully replaced
+- modules contain only module `<section>` content
+- `data-steps` JSON is valid
+- shared assets were copied from `references/`
+- module filenames sort in the intended order
+
+## Repository structure
+
+```text
+codebase-to-knowledge-engine/
+├── SKILL.md
+└── references/
+    ├── _base.html
+    ├── _footer.html
+    ├── build.sh
+    ├── content-philosophy.md
+    ├── design-system.md
+    ├── example-module.html
+    ├── gotchas.md
+    ├── interactive-elements.md
+    ├── main.js
+    ├── module-brief-template.md
+    └── styles.css
+```
 
 ## Design philosophy
 
-### Build first, understand later
+The teaching model is simple: **start from what the learner already experiences, then trace what the code is doing underneath**.
 
-This inverts traditional CS education. The old way: memorize concepts for years → eventually build something → finally see the point (most people quit before step 3). This way: **build something → experience it working → now understand how it works.**
+The goal is not to turn someone into a software engineer. The goal is practical fluency:
+- understand the moving parts
+- know where logic lives
+- follow the data
+- debug more effectively
+- make better calls when directing AI
 
-### Show, don't tell
+## Notes
 
-Every screen is at least 50% visual. Max 2-3 sentences per text block. If something can be a diagram, animation, or interactive element — it shouldn't be a paragraph.
-
-### Quizzes test doing, not knowing
-
-No "What does API stand for?" Instead: "A user reports stale data after switching pages. Where would you look first?" Quizzes test whether you can *use* what you learned to solve a new problem.
-
-### No recycled metaphors
-
-Each concept gets a metaphor that fits *that specific idea*. A database is a library with a card catalog. Auth is a bouncer checking IDs. API rate limiting is a nightclub with a capacity limit. Never the same metaphor twice.
-
-### Original code only
-
-Code snippets are exact copies from the real codebase — never modified or simplified. The learner should be able to open the actual file and see the same code they learned from.
-
-## Skill structure
-
-```
-codebase-to-course/
-├── SKILL.md                          # Main skill instructions
-└── references/
-    ├── design-system.md              # CSS tokens, typography, colors, layout
-    └── interactive-elements.md       # Quiz, animation, and visualization patterns
-```
-
-
+- Use real code snippets from the codebase
+- Prefer visuals over paragraphs
+- Keep modules practical and concrete
+- Avoid jargon without definitions
+- Always copy fresh shared assets from `references/`
+- Make the final course feel polished, not autogenerated
 
 ---
 

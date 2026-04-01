@@ -1,0 +1,194 @@
+<!-- Example reference module for codebase-to-knowledge-engine.
+Grounded in https://github.com/karpathy/autoresearch.
+This is intentionally partial: it demonstrates structure, tone, visual density,
+translation blocks, glossary terms, quiz wiring, and one flow animation.
+It is not meant to be copied verbatim into every course.
+-->
+<section class="module" id="module-1" style="background: var(--color-bg-warm)">
+  <div class="module-content">
+    <header class="module-header animate-in">
+      <span class="module-number">01</span>
+      <h1 class="module-title">A five-minute research factory</h1>
+      <p class="module-subtitle">Trace what autoresearch does when an agent launches a new experiment.</p>
+    </header>
+
+    <div class="module-body stagger-children">
+      <section class="screen animate-in">
+        <h2 class="screen-heading">The product in one sentence</h2>
+        <p>
+          <span class="term" data-definition="A codebase is the collection of source files that make up a software project — the app's blueprints, machinery, and rules all in one place.">Autoresearch</span>
+          is a tiny research lab in a repo: an AI agent edits one training file, runs a five-minute experiment, checks the score, and decides what to try next.
+        </p>
+        <div class="icon-rows">
+          <div class="icon-row">
+            <div class="icon-circle" style="background: var(--color-actor-1)">🧠</div>
+            <div>
+              <strong>program.md</strong>
+              <p>The human-written mission brief for the agent.</p>
+            </div>
+          </div>
+          <div class="icon-row">
+            <div class="icon-circle" style="background: var(--color-actor-2)">🛠️</div>
+            <div>
+              <strong>train.py</strong>
+              <p>The only file the agent is expected to change during experiments.</p>
+            </div>
+          </div>
+          <div class="icon-row">
+            <div class="icon-circle" style="background: var(--color-actor-3)">📦</div>
+            <div>
+              <strong>prepare.py</strong>
+              <p>Downloads data, trains the tokenizer, and exposes runtime utilities.</p>
+            </div>
+          </div>
+        </div>
+        <div class="callout callout-accent">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content">
+            <strong class="callout-title">Why you should care</strong>
+            <p>If you understand which file sets the rules and which file the agent mutates, you can steer an AI researcher without getting buried in ML internals.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen animate-in">
+        <h2 class="screen-heading">Think of it like a racing pit crew</h2>
+        <p>
+          A driver comes in, the crew swaps one part, sends the car out for a short lap, and reads the stopwatch.
+          Autoresearch works the same way: make one change, run a short test, keep the good ideas, throw out the bad ones.
+        </p>
+        <div class="flow-animation" data-steps='[
+          {"highlight":"flow-actor-1","label":"The human writes the mission in program.md"},
+          {"highlight":"flow-actor-1","label":"The brief is handed to the agent","packet":true,"from":"actor-1","to":"actor-2"},
+          {"highlight":"flow-actor-2","label":"The agent edits train.py"},
+          {"highlight":"flow-actor-2","label":"The new training run is launched","packet":true,"from":"actor-2","to":"actor-3"},
+          {"highlight":"flow-actor-3","label":"The experiment is scored with val_bpb"},
+          {"highlight":"flow-actor-3","label":"The score comes back for the next decision","packet":true,"from":"actor-3","to":"actor-2"}
+        ]'>
+          <div class="flow-actors">
+            <div class="flow-actor" id="flow-actor-1">
+              <div class="flow-actor-icon">👤</div>
+              <span>Human</span>
+            </div>
+            <div class="flow-actor" id="flow-actor-2">
+              <div class="flow-actor-icon">🤖</div>
+              <span>Agent</span>
+            </div>
+            <div class="flow-actor" id="flow-actor-3">
+              <div class="flow-actor-icon">📊</div>
+              <span>Training Run</span>
+            </div>
+          </div>
+          <div class="flow-packet" id="flow-packet"></div>
+          <div class="flow-step-label" id="flow-label">Click “Next Step” to trace one experiment.</div>
+          <div class="flow-controls">
+            <button class="btn flow-next-btn">Next Step</button>
+            <button class="btn flow-reset-btn">Restart</button>
+            <span class="flow-progress"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen animate-in">
+        <h2 class="screen-heading">The project’s whole power move fits in three bullets</h2>
+        <div class="pattern-cards">
+          <div class="pattern-card" style="border-top: 3px solid var(--color-actor-1)">
+            <div class="pattern-icon" style="background: var(--color-actor-1)">🎯</div>
+            <h4 class="pattern-title">One editable file</h4>
+            <p class="pattern-desc">The agent mainly changes <code>train.py</code>, which keeps diffs reviewable and the search space small.</p>
+          </div>
+          <div class="pattern-card" style="border-top: 3px solid var(--color-actor-2)">
+            <div class="pattern-icon" style="background: var(--color-actor-2)">⏱️</div>
+            <h4 class="pattern-title">Fixed time budget</h4>
+            <p class="pattern-desc">Every run gets the same five-minute wall-clock budget, so experiments are easier to compare fairly.</p>
+          </div>
+          <div class="pattern-card" style="border-top: 3px solid var(--color-actor-3)">
+            <div class="pattern-icon" style="background: var(--color-actor-3)">📉</div>
+            <h4 class="pattern-title">One metric</h4>
+            <p class="pattern-desc"><span class="term" data-definition="A metric is the score a system uses to judge success. Here, lower val_bpb means the model predicts text more efficiently.">val_bpb</span> decides whether a change helped or hurt.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen animate-in">
+        <h2 class="screen-heading">Code ↔ English: the fixed time budget</h2>
+        <p>The repo bakes the five-minute limit into the prep layer so every experiment plays by the same clock.</p>
+        <div class="translation-block animate-in">
+          <div class="translation-code">
+            <span class="translation-label">CODE</span>
+            <pre><code>
+<span class="code-line"><span class="code-property">TIME_BUDGET</span> = <span class="code-number">300</span>        <span class="code-comment"># training time budget in seconds (5 minutes)</span></span>
+<span class="code-line"><span class="code-property">EVAL_TOKENS</span> = <span class="code-number">40</span> * <span class="code-number">524288</span>  <span class="code-comment"># number of tokens for val eval</span></span>
+            </code></pre>
+          </div>
+          <div class="translation-english">
+            <span class="translation-label">PLAIN ENGLISH</span>
+            <div class="translation-lines">
+              <p class="tl">Every training run gets 300 seconds — exactly five minutes — so no experiment gets extra time to look artificially better.</p>
+              <p class="tl">The evaluation also uses a fixed amount of validation text, which makes the score more comparable from run to run.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen animate-in">
+        <h2 class="screen-heading">Code ↔ English: one file is fair game</h2>
+        <p>This sentence in the README quietly tells you who controls what.</p>
+        <div class="translation-block animate-in">
+          <div class="translation-code">
+            <span class="translation-label">CODE</span>
+            <pre><code>
+<span class="code-line">- <span class="code-string">**`prepare.py`**</span> — constants, one-time data prep, and runtime utilities. Not modified.</span>
+<span class="code-line">- <span class="code-string">**`train.py`**</span> — the single file the agent edits.</span>
+<span class="code-line">- <span class="code-string">**`program.md`**</span> — baseline instructions for one agent.</span>
+            </code></pre>
+          </div>
+          <div class="translation-english">
+            <span class="translation-label">PLAIN ENGLISH</span>
+            <div class="translation-lines">
+              <p class="tl">Leave the prep layer alone unless you intentionally want to change the rules of the experiment.</p>
+              <p class="tl">Let the agent mutate <code>train.py</code> — that is the sandbox where model ideas get tested.</p>
+              <p class="tl">Humans mostly edit <code>program.md</code>, which is more like managing the research team than writing the training code yourself.</p>
+            </div>
+          </div>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-icon">🧭</div>
+          <div class="callout-content">
+            <strong class="callout-title">Architecture lesson</strong>
+            <p>Good systems create clean boundaries: one place for human intent, one place for machine experimentation, one place for fixed infrastructure.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen animate-in">
+        <h2 class="screen-heading">Quick check: if you wanted safer experiments, where would you intervene first?</h2>
+        <div class="quiz-container" id="quiz-module1">
+          <div class="quiz-question-block"
+               data-correct="option-b"
+               data-explanation-right="Exactly. program.md is the mission brief for the agent, so changing it is the cleanest way to steer behavior without directly rewriting the training code."
+               data-explanation-wrong="Not quite. Think about the cleanest control point: where can a human shape the agent's strategy without editing the experiment machinery itself?">
+            <h3 class="quiz-question">You want the agent to try smaller, safer changes and explain each change before running it. What is the best first move?</h3>
+            <div class="quiz-options">
+              <button class="quiz-option" data-value="option-a" onclick="selectOption(this)">
+                <div class="quiz-option-radio"></div>
+                <span>Edit <code>prepare.py</code> because it owns constants and data prep</span>
+              </button>
+              <button class="quiz-option" data-value="option-b" onclick="selectOption(this)">
+                <div class="quiz-option-radio"></div>
+                <span>Edit <code>program.md</code> because it shapes the agent's instructions</span>
+              </button>
+              <button class="quiz-option" data-value="option-c" onclick="selectOption(this)">
+                <div class="quiz-option-radio"></div>
+                <span>Edit random hyperparameters in <code>train.py</code> before the agent starts</span>
+              </button>
+            </div>
+            <div class="quiz-feedback"></div>
+          </div>
+          <button class="quiz-check-btn" onclick="checkQuiz('quiz-module1')">Check Answer</button>
+          <button class="quiz-reset-btn" onclick="resetQuiz('quiz-module1')">Try Again</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</section>
